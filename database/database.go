@@ -16,5 +16,6 @@ func Connect() {
 	if err != nil {
 		log.Fatal("Erro ao conectar com o banco de dados:", err)
 	}
+	log.Println("Conexão com o banco realizada com sucesso!") // <-- Adicione este log
 	DB.AutoMigrate(&models.Evento{})
 }

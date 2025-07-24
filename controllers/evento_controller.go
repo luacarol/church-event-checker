@@ -16,12 +16,21 @@ func GetEventos(c *gin.Context) {
 
 func CreateEvento(c *gin.Context) {
 	var evento models.Evento
+
+	// Faz o bind do JSON recebido para o struct Evento
 	if err := c.ShouldBindJSON(&evento); err != nil {
 		c.JSON(http.StatusBadRequest, gin.H{"error": err.Error()})
 		return
 	}
-	database.DB.Create(&evento)
-	c.JSON(http.StatusCreated, evento)
+
+	// Salva o evento no banco de dados
+	if err := database.DB.Create(&evento).Error; err != nil {
+		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
+		return
+	}
+
+	// Responde com o evento criado
+	c.JSON(http.StatusOK, gin.H{"data": evento})
 }
 
 func GetEventoByID(c *gin.Context) {

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Cadastro de Evento</title>
+  <style>
+    body { font-family: sans-serif; padding: 2rem; background: #f0f0f0; }
+    form { background: #fff; padding: 2rem; border-radius: 8px; max-width: 600px; margin: auto; }
+    label { display: block; margin-top: 1rem; }
+    input, textarea, select { width: 100%; padding: 0.5rem; margin-top: 0.25rem; }
+    button { margin-top: 1.5rem; padding: 0.75rem 1.5rem; background: #4f46e5; color: white; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #4338ca; }
+  </style>
+</head>
+<body>
+
+  <form id="eventoForm">
+    <h2>Preencher Evento</h2>
+
+    <label>Tipo de Culto:
+      <select name="tipo" required>
+        <option value="oracao">Oração</option>
+        <option value="culto_oracao">Culto de Oração</option>
+        <option value="limpeza">Limpeza</option>
+        <option value="ebd">EBD</option>
+        <option value="louvor">Louvor e Adoração</option>
+        <option value="ceia">Ceia</option>
+      </select>
+    </label>
+
+    <label>Data:
+      <input type="datetime-local" name="data" required />
+    </label>
+
+    <label>Abertura (texto):
+      <input type="text" name="abertura_texto" required />
+    </label>
+
+    <label>Responsável pela Abertura:
+      <input type="text" name="abertura_responsavel" required />
+    </label>
+
+    <label>Tipo de Responsável pela Abertura:
+      <select name="abertura_tipo_responsavel" required>
+        <option value="Fem">Feminino</option>
+        <option value="Mas">Masculino</option>
+        <option value="Irm">Irmão/Irmã</option>
+        <option value="Ev">Evangelista</option>
+        <option value="Miss">Missionário(a)</option>
+        <option value="Past">Pastor(a)</option>
+        <option value="Presb">Presbítero(a)</option>
+      </select>
+    </label>
+
+    <label>Palavra (texto):
+      <input type="text" name="palavra_texto" required />
+    </label>
+
+    <label>Responsável pela Palavra:
+      <input type="text" name="palavra_responsavel" required />
+    </label>
+
+    <label>Tipo de Responsável pela Palavra:
+      <select name="palavra_tipo_responsavel" required>
+        <option value="Fem">Feminino</option>
+        <option value="Mas">Masculino</option>
+        <option value="Irm">Irmão/Irmã</option>
+        <option value="Ev">Evangelista</option>
+        <option value="Miss">Missionário(a)</option>
+        <option value="Past">Pastor(a)</option>
+        <option value="Presb">Presbítero(a)</option>
+      </select>
+    </label>
+
+    <label>Possui tema?
+      <select name="possui_tema" required>
+        <option value="true">Sim</option>
+        <option value="false">Não</option>
+      </select>
+    </label>
+
+    <label>Tema:
+      <input type="text" name="tema" />
+    </label>
+
+    <label>Louvores:
+      <textarea name="louvores" rows="3"></textarea>
+    </label>
+
+    <button type="submit">Enviar Evento</button>
+    <p id="resposta" style="margin-top: 1rem;"></p>
+  </form>
+
+  <script>
+    const form = document.getElementById("eventoForm");
+    const resposta = document.getElementById("resposta");
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      const formData = new FormData(form);
+      const data = Object.fromEntries(formData.entries());
+
+      // Corrigir tipos
+      data.possui_tema = data.possui_tema === "true";
+      data.data = new Date(data.data).toISOString();
+
+      try {
+        const res = await fetch("http://localhost:8000/api/eventos", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(data),
+        });
+
+        if (!res.ok) throw new Error("Erro ao enviar evento");
+
+        const json = await res.json();
+        resposta.textContent = "✅ Evento enviado com sucesso!";
+        form.reset();
+      } catch (err) {
+        resposta.textContent = "❌ Falha ao enviar: " + err.message;
+      }
+    });
+  </script>
+
+</body>
+</html>
